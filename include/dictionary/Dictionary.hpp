@@ -13,6 +13,7 @@ class Dictionary{
 
     // Destrutor Virtual
     virtual ~Dictionary() = default; 
+
   
     // Métodos que alteram a estrutura
     virtual void insert(K& key, V& value) = 0;
@@ -22,6 +23,7 @@ class Dictionary{
 
 
     // Métodos de leitura, que não alteram a estrutura 
+    virtual Iterator<K, V> getIterator() = 0;
     virtual V get(const K& key) const = 0;
     virtual bool contains(K& key) const = 0;
     virtual std::size_t size() const = 0;
