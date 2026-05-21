@@ -61,8 +61,12 @@ Node* rightRotation(Node* node){
 }
 
 void fixUpInsertion(Node* node){
-    
 
+
+}
+
+int balance(Node* node){
+    return (node->right->height - node->left->height);
 }
 
 

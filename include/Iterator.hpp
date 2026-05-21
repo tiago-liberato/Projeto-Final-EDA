@@ -2,10 +2,10 @@
 #define ITERATOR
 
 /**
- * @brief 
+ * @brief Classe Iterator responsável por pecorrer as estruturas de dados do Dicionário
  * 
- * @tparam K 
- * @tparam V 
+ * @tparam K parametro para chave
+ * @tparam V parametro para valor
  */
 
 template<typename K, typename V>
