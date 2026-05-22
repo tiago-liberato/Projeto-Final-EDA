@@ -112,9 +112,6 @@ void add(const K& key, const V& value) {
     Node* aux = this->root;
 
     while(aux != nullptr) {
-        if(key == aux->key){
-            throw runtime_error("Chave Repetida")
-        }
         if(key < aux->key){
             pais.push(aux);
             aux = aux->left;
@@ -122,10 +119,43 @@ void add(const K& key, const V& value) {
             pais.push(aux);
             aux = aux->right;
         }else{
-            throw runtime_error("")
+            throw runtime_error("Chave Repetida")
         }
     }
-    aux = new Node(key, value, 1, nullptr, nullptr )
+
+    //Cria o novo nó
+    aux = new Node(key, value, 1, nullptr, nullptr );
+
+    //Liga o novo nó ao pai
+    if(!pais.empty()){
+        Node* pai = pais.top();
+        if(aux->key > pai->key){
+            pai->right = aux;
+        }else{
+            pai->left = aux;
+        }
+    }
+
+    //Rebalanceia a árvore
+    while(!pais.empty()){
+        Node* atual = pais.top();
+        atual = fixUpNode(atual);
+        pais.pop();
+
+        if(!pais.empty()){
+            Node* pai = pais.top();
+            
+            if(atual->key > pai->key){ //Liga a subárvore rebalanceada ao pai
+                pai->right = atual;
+            }else{
+                pai->left = atual;
+            }
+        }else{
+            this->root = atual;
+        }
+
+
+    }
 }
 
 Node* search(const K& key) const {
