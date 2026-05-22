@@ -111,8 +111,6 @@ void add(const K& key, const V& value) {
     stack<Node*> pais; // Guarda o caminho percorrido na árvore
     Node* aux = this->root;
 
-
-
     while(aux != nullptr) {
         if(key == aux->key){
             throw runtime_error("Chave Repetida")
@@ -154,7 +152,7 @@ void clear() override {}
 
 V get (const K& key) const override {}
 
-size_t sise() const override {}
+size_t size() const override {}
 
 bool contains (const K& key) const override {}
 
