@@ -17,7 +17,7 @@ class AVLtree : public Dictionary<K, V>{
 
 private:
 
- struct Node{
+struct Node{
     K key;
     V value;
     int height;
@@ -31,36 +31,23 @@ private:
         this->left = left;
         this->right = right;
     }
-    
-}
+};
 
 Node* root;
 
-void add(Node* node, K key, V value){
 
-    stack<Node*> pais; // Guarda o caminho percorrido na árvore
-    Node* aux = this->root;
 
-    while(aux != nullptr){
-        if(key == aux->key){
-            throw runtime_error("Chave Repetida")
-        }
-        if(value < aux->value){
-            pais.push(aux);
-            aux = aux->left;
-        }else if(value > aux->value){
-            pais.push(aux);
-            aux = aux->right;
-        }else{
-            throw runtime_error("")
-        }
-    }
+// botei esses métodos aqui pq eles são auxiliares em outras funções, então eles precisam vir antes
 
-    aux = new Node(key, value, 1, nullptr, nullptr )
-   
 
+int height(Node* node){
+    return (node == nullptr) ? 0 : node->height;
 }
 
+int balance(Node* node){
+    if(node == nullptr) return 0;
+    return (height(node->right) - height(node->left));
+}
 
 Node* leftRotation(Node* node){
     Node* y = node->right;
@@ -88,62 +75,91 @@ Node* rightRotation(Node* node){
 }
 
 
-Node* fixUpInsertion(Node* node, V value){ // MUDAR O NOME value POR VALUE
+Node* fixUpNode(Node* node){ // MUDAR O NOME value POR VALUE
     int balance = balance(node);
     
     //Caso 1(a): Configuração esq-esq - rotação a direita
-    if(balance < -1 && value < node->left->value)
+    if(balance == -2 && balance(node->left) < 0)
         return rightRotation(node);
 
     //Caso 1(b): Configuração esq dir - rotação dupla a direita
-    else if(balance < -1 && value > node->left->value){
+    if(balance == -2 && balance(node->left) > 0) {
         node->left = leftRotation(node->left);
         return rightRotation(node);
     }
 
-    //Caso 2(b): Configuração dir-dir - rotação a esquerda
-    if(balance > 1 && value > node->right->value)
+    //Caso 2(a): Configuração dir-dir - rotação a esquerda
+    if(balance == 2 && balance(node->right) > 0)
         return leftRotation(node);
 
-    else if(balance > 1 && value < node->right->value){
+    //Casi 2(b): 
+    if(balance == 2 && balance(node->right) < 0){
         node->right = rightRotation(node->right);
         return leftRotation(node);
     }
 
     node -> height = 1 + max ( height (node -> left ) , height (node -> right ) );
-
-
-
+    return node;
 }
 
-int balance(Node* node){
-    if(node == nullptr) return 0;
-    return (height(node->right) - height(node->left));
-}
+void add(const K& key, const V& value) {
+    if(this->root == nullptr) {
+        this->root = new Node(key, value, 1, nullptr, nullptr);
+    }
 
-int height(Node* node){
-    return node->height;
-}
+    stack<Node*> pais; // Guarda o caminho percorrido na árvore
+    Node* aux = this->root;
 
+
+
+    while(aux != nullptr) {
+        if(key == aux->key){
+            throw runtime_error("Chave Repetida")
+        }
+        if(key < aux->key){
+            pais.push(aux);
+            aux = aux->left;
+        }else if(key > aux->key){
+            pais.push(aux);
+            aux = aux->right;
+        }else{
+            throw runtime_error("")
+        }
+    }
+    aux = new Node(key, value, 1, nullptr, nullptr )
+}
 
 
 public:
 
-void insert(K key, V value){
-    
+AVLtree(){
+    this->root = nullptr;
+}
+
+void insert(const K& key, const V& value) override {
+    add( key, value);
 }
 
 
+void update(const K& key, const V& value) override {
+    //TODO
+}
 
+void remove(const K& key) override {
+    //TODO
+}
 
+void clear() override {}
 
+V get (const K& key) override {}
 
+size_t sise() {}
 
+bool contains (const K& key) override {}
 
-
-
-
+Iterator<K, V> getIterator() override {}
 
 };
+
 
 #endif
