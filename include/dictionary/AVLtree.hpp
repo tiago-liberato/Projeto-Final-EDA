@@ -235,7 +235,10 @@ bool contains (const K& key) const override {
     return search(key) != nullptr;
 }
 
-Iterator<K, V> getIterator() override {}
+//Retorna uma instância da classe AVLIterator
+Iterator<K, V> getIterator() override {
+    return new AVLIterator();
+}
 
 };
 
