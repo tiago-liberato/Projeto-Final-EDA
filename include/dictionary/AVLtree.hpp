@@ -105,6 +105,7 @@ Node* fixUpNode(Node* node){ // MUDAR O NOME value POR VALUE
 void add(const K& key, const V& value) {
     if(this->root == nullptr) {
         this->root = new Node(key, value, 1, nullptr, nullptr);
+        return;
     }
 
     stack<Node*> pais; // Guarda o caminho percorrido na árvore
@@ -151,11 +152,11 @@ void remove(const K& key) override {
 
 void clear() override {}
 
-V get (const K& key) override {}
+V get (const K& key) const override {}
 
-size_t sise() {}
+size_t sise() const override {}
 
-bool contains (const K& key) override {}
+bool contains (const K& key) const override {}
 
 Iterator<K, V> getIterator() override {}
 
