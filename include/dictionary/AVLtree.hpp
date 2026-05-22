@@ -76,24 +76,24 @@ Node* rightRotation(Node* node){
 
 
 Node* fixUpNode(Node* node){ // MUDAR O NOME value POR VALUE
-    int balance = balance(node);
+    int b = balance(node);
     
     //Caso 1(a): Configuração esq-esq - rotação a direita
-    if(balance == -2 && balance(node->left) < 0)
+    if(b == -2 && balance(node->left) < 0)
         return rightRotation(node);
 
     //Caso 1(b): Configuração esq dir - rotação dupla a direita
-    if(balance == -2 && balance(node->left) > 0) {
+    if(b == -2 && balance(node->left) > 0) {
         node->left = leftRotation(node->left);
         return rightRotation(node);
     }
 
     //Caso 2(a): Configuração dir-dir - rotação a esquerda
-    if(balance == 2 && balance(node->right) > 0)
+    if(b == 2 && balance(node->right) > 0)
         return leftRotation(node);
 
     //Casi 2(b): 
-    if(balance == 2 && balance(node->right) < 0){
+    if(b == 2 && balance(node->right) < 0){
         node->right = rightRotation(node->right);
         return leftRotation(node);
     }
