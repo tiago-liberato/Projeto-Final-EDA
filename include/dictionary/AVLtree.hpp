@@ -35,6 +35,38 @@ struct Node{
 
 Node* root;
 
+class AVLIterator: public iterator{
+private:
+    stack<Node*> pilha;
+
+public:
+
+    AVLIterator(){
+        pushLeft(this->root);
+    }
+
+    //Método responsável por empilhar os nós da esquerda
+    void pushLeft(Node* node){
+        while(node != nullptr){
+            pilha.push(node);
+            node = node->left;
+        }
+    }
+
+    //Método responsárvel por retornar se ainda existem elementos a serem percorridos
+    bool hasNext() override{
+        return !pilha.empty();
+    }
+
+    // Retorna um par com a chave e o valor do próximo elemento
+    pair<K, V> next(){
+        Node* atual = pilha.top();
+        pushLeft(atual->right);
+        pilha.pop();
+        return {atual->key, atual->value};
+    }
+}
+
 
 
 // botei esses métodos aqui pq eles são auxiliares em outras funções, então eles precisam vir antes
@@ -75,7 +107,7 @@ Node* rightRotation(Node* node){
 }
 
 
-Node* fixUpNode(Node* node){ // MUDAR O NOME value POR VALUE
+Node* fixUpNode(Node* node){ 
     int b = balance(node);
     
     //Caso 1(a): Configuração esq-esq - rotação a direita
@@ -92,7 +124,7 @@ Node* fixUpNode(Node* node){ // MUDAR O NOME value POR VALUE
     if(b == 2 && balance(node->right) > 0)
         return leftRotation(node);
 
-    //Casi 2(b): 
+    //Caso 2(b): 
     if(b == 2 && balance(node->right) < 0){
         node->right = rightRotation(node->right);
         return leftRotation(node);
