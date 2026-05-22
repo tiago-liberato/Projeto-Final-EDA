@@ -130,6 +130,17 @@ void add(const K& key, const V& value) {
     aux = new Node(key, value, 1, nullptr, nullptr )
 }
 
+Node* search(const K& key) const {
+    Node* aux = this->root;
+    
+    while (aux != nullptr) {
+        if (key == aux->key) return aux;
+        else if (key > aux->key) aux = aux->right;
+        else aux = aux->left;
+    }
+   return nullptr;
+}
+
 
 public:
 
@@ -152,11 +163,17 @@ void remove(const K& key) override {
 
 void clear() override {}
 
-V get (const K& key) const override {}
+V get (const K& key) const override { 
+    Node* result = search(key);
+    if (result != nullptr) return result->value;
+    throw runtime_error("Chave não encontrada na arvore");
+}
 
 size_t sise() const override {}
 
-bool contains (const K& key) const override {}
+bool contains (const K& key) const override {
+    return search(key) != nullptr;
+}
 
 Iterator<K, V> getIterator() override {}
 
