@@ -223,6 +223,7 @@ void remove(const K& key) override {
 
 void clear() override {}
 
+// Retorna o valor relacionado a chave 
 V get (const K& key) const override { 
     Node* result = search(key);
     if (result != nullptr) return result->value;
@@ -231,6 +232,7 @@ V get (const K& key) const override {
 
 size_t size() const override {}
 
+// Retorna se existe ou não a chave no dicionário
 bool contains (const K& key) const override {
     return search(key) != nullptr;
 }
