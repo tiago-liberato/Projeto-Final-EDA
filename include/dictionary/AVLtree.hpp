@@ -2,6 +2,7 @@
 #define AVL_TREE
 
 #include <stack>
+#include "iterator"
 
 using namespace std;
 
@@ -34,10 +35,20 @@ struct Node{
 };
 
 Node* root;
+int _size = 0;
 
 class AVLIterator: public iterator{
+
 private:
-    stack<Node*> pilha;
+    stack<Node*> stack_nodes;
+    
+    //Método responsável por empilhar os nós da esquerda
+    void pushLeft(Node* node){
+        while(node != nullptr){
+            stack_nodes.push(node);
+            node = node->left;
+        }
+    }
 
 public:
 
@@ -45,24 +56,17 @@ public:
         pushLeft(this->root);
     }
 
-    //Método responsável por empilhar os nós da esquerda
-    void pushLeft(Node* node){
-        while(node != nullptr){
-            pilha.push(node);
-            node = node->left;
-        }
-    }
 
     //Método responsárvel por retornar se ainda existem elementos a serem percorridos
     bool hasNext() override{
-        return !pilha.empty();
+        return !stack_nodes.empty();
     }
 
     // Retorna um par com a chave e o valor do próximo elemento
     pair<K, V> next(){
-        Node* atual = pilha.top();
+        Node* atual = stack_nodes.top();
         pushLeft(atual->right);
-        pilha.pop();
+        stack_nodes.pop();
         return {atual->key, atual->value};
     }
 }
@@ -188,6 +192,7 @@ void add(const K& key, const V& value) {
 
 
     }
+    _size++;
 }
 
 Node* search(const K& key) const {
@@ -201,6 +206,25 @@ Node* search(const K& key) const {
    return nullptr;
 }
 
+void _clear(){
+
+    if(this->root = nullptr) return;
+
+    stack<Node*> stack_aux = this->root;
+
+    while(!stack_aux.empty()){
+        Node* aux = stack_aux.top();
+        stack_aux.pop();
+
+        if(aux->left != nullptr) stack_aux.push(aux->left);
+        if(aux->right != nullptr) stack_aux.push(aux->right);
+
+        delete aux;
+    }
+
+    this->root = nullptr;
+    this->_Size = 0;
+}
 
 public:
 
@@ -230,7 +254,9 @@ V get (const K& key) const override {
     throw runtime_error("Chave não encontrada na arvore");
 }
 
-size_t size() const override {}
+size_t size() const override {
+    return _size;
+}
 
 // Retorna se existe ou não a chave no dicionário
 bool contains (const K& key) const override {
