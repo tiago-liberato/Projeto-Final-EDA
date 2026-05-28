@@ -262,7 +262,7 @@ bool contains (const K& key) const override {
 }
 
 //Retorna uma instância da classe AVLIterator
-Iterator<K, V> getIterator() override {
+Iterator<K, V>* getIterator() override {
     return new AVLIterator();
 }
 
