@@ -25,13 +25,8 @@ struct Node{
     Node* left;
     Node* right;
 
-    Node(K key, V value, int h, Node* left, Node* right){
-        this->key = key;
-        this->value = value;
-        this->height = h;
-        this->left = left;
-        this->right = right;
-    }
+   Node(const K& key, const V& value, int h, Node* left, Node* right)
+    : key(key), value(value), height(h), left(left), right(right) {}
 };
 
 Node* root;
@@ -262,7 +257,7 @@ bool contains (const K& key) const override {
 }
 
 //Retorna uma instância da classe AVLIterator
-Iterator<K, V>* getIterator() override {
+Iterator<K, V>* getIterator() const override {
     return new AVLIterator();
 }
 
