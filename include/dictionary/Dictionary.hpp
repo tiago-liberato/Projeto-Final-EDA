@@ -1,6 +1,6 @@
 #ifndef DICTIONARY
 #define DICTIONARY
-
+#include "../Iterator.hpp"
 /**
  * @brief  Interface para a estrutura de dados do dicionário
  * 
@@ -16,9 +16,9 @@ public:
 
   
     // Métodos que alteram a estrutura
-    virtual void insert(K& key, V& value) = 0;
-    virtual void update(K& key, V& value) = 0;
-    virtual void remove(K& key) = 0;
+    virtual void insert(const K& key, const V& value) = 0;
+    virtual void update(const K& key, const V& value) = 0;
+    virtual void remove(const K& key) = 0;
     virtual void clear() = 0;
 
 

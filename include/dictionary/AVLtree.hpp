@@ -2,8 +2,7 @@
 #define AVL_TREE
 
 #include <stack>
-#include "Iterator.hpp"
-
+#include "../Iterator.hpp"
 using namespace std;
 
 /**
@@ -32,39 +31,35 @@ struct Node{
 Node* root;
 int _size = 0;
 
-class AVLIterator: public Iterator<K, V>{
-
-private:
-    stack<Node*> stack_nodes;
-    
-    //Método responsável por empilhar os nós da esquerda
-    void pushLeft(Node* node){
-        while(node != nullptr){
-            stack_nodes.push(node);
-            node = node->left;
+class AVLIterator : public Iterator<K, V> {
+    private:
+        stack<Node*> stack_nodes;
+        
+        // Método responsável por empilhar os nós da esquerda
+        void pushLeft(Node* node){
+            while(node != nullptr){
+                stack_nodes.push(node);
+                node = node->left;
+            }
         }
-    }
 
-public:
+    public:
+        AVLIterator(Node* raiz){
+            pushLeft(raiz);
+        }
 
-    AVLIterator(){
-        pushLeft(this->root);
-    }
+        bool hasNext() override {
+            return !stack_nodes.empty();
+        }
 
-
-    //Método responsárvel por retornar se ainda existem elementos a serem percorridos
-    bool hasNext() override{
-        return !stack_nodes.empty();
-    }
-
-    // Retorna um par com a chave e o valor do próximo elemento
-    pair<K, V> next(){
-        Node* atual = stack_nodes.top();
-        pushLeft(atual->right);
-        stack_nodes.pop();
-        return {atual->key, atual->value};
-    }
-};
+        // Retorna um par com a chave e o valor do próximo elemento
+            pair<K, V> next() override {
+            Node* atual = stack_nodes.top();
+            stack_nodes.pop(); // Remove do topo antes de empilhar os próximos
+            pushLeft(atual->right);
+            return {atual->key, atual->value};
+        }
+    }; // fim do Iterator
 
 
 
@@ -354,7 +349,7 @@ bool contains (const K& key) const override {
 
 //Retorna uma instância da classe AVLIterator
 Iterator<K, V>* getIterator() const override {
-    return new AVLIterator();
+    return new AVLIterator(this->root);
 }
 
 ~AVLtree() {
