@@ -1,18 +1,26 @@
 #include <iostream>
 #include <map>
+#include <vector>
+#include "Text_Processor.hpp"
+#include "AVLtree.hpp"
+
 using namespace std;
 
 
 void help(){
-    cout << "Comando inválido" << endl;
-    //TODO
+    cout << "Comandos válidos:" << "\n";
+    cout << "--help" << "\n";
+    cout << "dicionario_avl" << "\n";
+    cout << "dicionario_redblack" << "\n";
+    cout << "dicionario_chaining" << "\n";
+    cout << "dicionario_openAdr" << "\n";
     return;
 
 };
 
 int main(int arg, char* args[]){
 
-    if(arg < 1){
+    if(arg < 3){
         help();
     }
 
@@ -24,7 +32,12 @@ int main(int arg, char* args[]){
         {"dicionario_openadr", 4}
     };
 
-    string command = args[3];
+    string command = args[1];
+    string file = args[2];
+
+    
+    vector<string> words = Text_Processor::readFile(file);
+    Dictionary<string, int>* dict;
 
     switch (opc[command])
     {
@@ -32,10 +45,10 @@ int main(int arg, char* args[]){
         help();
         break;
 
-    case 1: 
-        //TODO  
+    case 1:{
+        
         break;
-    case 2:
+    }case 2:
         //TODO
         break;
     case 3:

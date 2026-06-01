@@ -10,9 +10,9 @@
 
 template<typename K, typename V>
 class Iterator{
-
+public:
     virtual bool hasNext() = 0;
-    virtual <K&, V&> next() = 0;
+    virtual pair<K&, V&> next() = 0;
 
 };
 

@@ -10,7 +10,7 @@
 
 template<typename K, typename V>
 class Dictionary{
-
+public:
     // Destrutor Virtual
     virtual ~Dictionary() = default; 
 
@@ -23,9 +23,9 @@ class Dictionary{
 
 
     // Métodos de leitura, que não alteram a estrutura 
-    virtual Iterator<K, V> getIterator() = 0;
+    virtual Iterator<K, V>* getIterator() const = 0;
     virtual V get(const K& key) const = 0;
-    virtual bool contains(K& key) const = 0;
+    virtual bool contains(const K& key) const = 0;
     virtual std::size_t size() const = 0;
 };
 
