@@ -136,6 +136,7 @@ Node* fixUpNode(Node* node){
 void add(const K& key, const V& value) {
     if(this->root == nullptr) {
         this->root = new Node(key, value, 1, nullptr, nullptr);
+        this->size++;
         return;
     }
 
@@ -150,7 +151,7 @@ void add(const K& key, const V& value) {
             pais.push(aux);
             aux = aux->right;
         }else{
-            throw runtime_error("Chave Repetida")
+            throw runtime_error("Chave Repetida");
         }
     }
 
@@ -323,16 +324,17 @@ void insert(const K& key, const V& value) override {
     add( key, value);
 }
 
-
 void update(const K& key, const V& value) override {
     _update(key, value);
 }
 
 void remove(const K& key) override {
-    //TODO
+    _remove(key);
 }
 
-void clear() override {}
+void clear() override {
+    _clear()
+}
 
 // Retorna o valor relacionado a chave 
 V get (const K& key) const override { 
@@ -353,6 +355,10 @@ bool contains (const K& key) const override {
 //Retorna uma instância da classe AVLIterator
 Iterator<K, V>* getIterator() const override {
     return new AVLIterator();
+}
+
+~AVLtree() {
+    _clear();
 }
 
 };
