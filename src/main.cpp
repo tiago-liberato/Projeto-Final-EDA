@@ -22,6 +22,7 @@ int main(int arg, char* args[]){
 
     if(arg < 3){
         help();
+        return 1;
     }
 
     map<string, int> opc = {
@@ -37,17 +38,19 @@ int main(int arg, char* args[]){
 
     
     vector<string> words = Text_Processor::readFile(file);
-    Dictionary<string, int>* dict;
+    Dictionary<string, int>* dict = nullptr;
 
     switch (opc[command])
     {
     case 0:
         help();
-        break;
+        return 0;
 
     case 1:{
-        
+
+        dict = new AVLtree<string, int>();
         break;
+
     }case 2:
         //TODO
         break;
@@ -57,9 +60,25 @@ int main(int arg, char* args[]){
     case 4:
         //TODO
         break;
+
     default:
-        break;
+        cout << "Comando inválido" << "\n";
+        help();
+        return 1;
+}
+
+
+for(string word: words){
+    if(dict->contains(word)){
+        int aux = dict->get(word);
+        aux ++;
+        dict->update(word, aux);
+    }else{
+        dict->insert(word, 1);
     }
+}
+
+Text_Processor::writeCSV("result.csv", dict);
 
 };
 
