@@ -202,7 +202,6 @@ Node* search(const K& key) const {
 }
 
 void _clear(){
-
     if(this->root == nullptr) return;
 
     stack<Node*> stack_aux;
@@ -229,6 +228,88 @@ void _update(const K& key, const V& value) {
     } else {
             // lanca um erro se tentar atualizar uma chave inexistente
         throw runtime_error("Chave não encontrada para atualização");
+    }
+}
+
+void _remove(const K& key) {
+    if (this->root == nullptr) return; // Árvore vazia, nada a fazer
+
+    stack<Node*> pais;
+    Node* aux = this->root;
+    Node* pai = nullptr;
+
+        //  Busca o nó a ser removido
+    while (aux != nullptr && aux->key != key) {
+        pai = aux;
+        pais.push(pai); // Guarda o caminho
+            
+        if (key < aux->key) aux = aux->left;
+            else aux = aux->right;
+        }
+
+        // Se o laço terminou e aux é nulo, a chave não existe
+        if (aux == nullptr) {
+            throw runtime_error("Chave não encontrada para remoção");
+        }
+
+        Node* noRemover = aux;
+
+        
+        // O nó tem 2 filhos
+        if (noRemover->left != nullptr && noRemover->right != nullptr) {
+            Node* sucessorPai = noRemover;
+            pais.push(sucessorPai); // O nó a ser removido continua na árvore
+            
+            // Vamos achar o Sucessor (o menor nó da subárvore direita)
+            Node* sucessor = noRemover->right;
+            while (sucessor->left != nullptr) {
+                sucessorPai = sucessor;
+                pais.push(sucessorPai);
+                sucessor = sucessor->left;
+            }
+
+            noRemover->key = sucessor->key;
+            noRemover->value = sucessor->value;
+
+            aux = sucessor;
+            pai = sucessorPai;
+        }
+
+        // O nó que vai ser removido agora tem 0 ou 1 filho.
+        Node* filho = (aux->left != nullptr) ? aux->left : aux->right;
+
+        if (pai == nullptr) {
+            this->root = filho;
+        } 
+        else if (pai->left == aux) {
+            pai->left = filho;
+        } 
+        else {
+            pai->right = filho;
+        }
+        delete aux;
+        this->_size--;
+
+        while (!pais.empty()) {
+            Node* atual = pais.top();
+            pais.pop();
+
+            atual->height = 1 + max(height(atual->left), height(atual->right));
+
+            Node* novaRaiz = fixUpNode(atual);
+
+            if (novaRaiz != atual) {
+                if (pais.empty()) {
+                    this->root = novaRaiz;
+                } else {
+                    Node* avo = pais.top();
+                if (novaRaiz->key < avo->key) {
+                        avo->left = novaRaiz;
+                }else {
+                        avo->right = novaRaiz;
+                }
+            }
+        }
     }
 }
 
