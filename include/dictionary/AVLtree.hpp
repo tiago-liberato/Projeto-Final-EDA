@@ -2,7 +2,7 @@
 #define AVL_TREE
 
 #include <stack>
-#include "iterator"
+#include "Iterator.hpp"
 
 using namespace std;
 
@@ -32,7 +32,7 @@ struct Node{
 Node* root;
 int _size = 0;
 
-class AVLIterator: public iterator{
+class AVLIterator: public Iterator<K, V>{
 
 private:
     stack<Node*> stack_nodes;
@@ -64,7 +64,7 @@ public:
         stack_nodes.pop();
         return {atual->key, atual->value};
     }
-}
+};
 
 
 
@@ -136,7 +136,7 @@ Node* fixUpNode(Node* node){
 void add(const K& key, const V& value) {
     if(this->root == nullptr) {
         this->root = new Node(key, value, 1, nullptr, nullptr);
-        this->size++;
+        this->_size++;
         return;
     }
 
@@ -333,7 +333,7 @@ void remove(const K& key) override {
 }
 
 void clear() override {
-    _clear()
+    _clear();
 }
 
 // Retorna o valor relacionado a chave 
