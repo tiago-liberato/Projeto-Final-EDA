@@ -203,9 +203,10 @@ Node* search(const K& key) const {
 
 void _clear(){
 
-    if(this->root = nullptr) return;
+    if(this->root == nullptr) return;
 
-    stack<Node*> stack_aux = this->root;
+    stack<Node*> stack_aux;
+    stack_aux.push(this->root);
 
     while(!stack_aux.empty()){
         Node* aux = stack_aux.top();
@@ -218,7 +219,17 @@ void _clear(){
     }
 
     this->root = nullptr;
-    this->_Size = 0;
+    this->_size = 0;
+}
+
+void _update(const K& key, const V& value) {
+    Node* modificado = search(key);  
+    if (modificado != nullptr) {
+         modificado->value = value; // atualiza o valor se a chave existir
+    } else {
+            // lanca um erro se tentar atualizar uma chave inexistente
+        throw runtime_error("Chave não encontrada para atualização");
+    }
 }
 
 public:
@@ -233,7 +244,7 @@ void insert(const K& key, const V& value) override {
 
 
 void update(const K& key, const V& value) override {
-    //TODO
+    _update(key, value);
 }
 
 void remove(const K& key) override {
