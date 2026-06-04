@@ -7,6 +7,7 @@
 #include <vector>
 #include "Dictionary.hpp"
 #include "Iterator.hpp"
+#include <algorithm>
 using namespace std;
 
 /**
@@ -14,6 +15,21 @@ using namespace std;
  * 
  */
 class Text_Processor{
+private:
+
+    static string toLower(string word){
+        transform(word.begin(), word.end(), word.begin(), ::tolower);
+        return word;
+    }
+
+    static string cleanWord(string word){
+        word.erase(remove_if(word.begin(), word.end(), [](char c){
+            return ispunct(c) && c != '-';
+        }), word.end());
+
+        return word;
+    }
+
 public: 
 
 static vector<string> readFile(string path){
@@ -27,7 +43,9 @@ static vector<string> readFile(string path){
     string word;
 
     while(file >> word){
-        words.push_back(word);
+        word = cleanWord(toLower(word));
+        if(!word.empty())
+            words.push_back(word);
     }
 
     return words;

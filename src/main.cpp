@@ -3,6 +3,7 @@
 #include <vector>
 #include "Text_Processor.hpp"
 #include "AVLtree.hpp"
+#include "RedBlackTree.hpp"
 
 using namespace std;
 
@@ -52,7 +53,7 @@ int main(int arg, char* args[]){
         break;
 
     }case 2:
-        //TODO
+        dict = new RedBlackTree<string, int>();
         break;
     case 3:
         //TODO
@@ -79,6 +80,9 @@ for(string word: words){
 }
 
 Text_Processor::writeCSV("result.csv", dict);
+
+delete dict;
+return 0;
 
 };
 
