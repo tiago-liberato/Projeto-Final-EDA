@@ -4,6 +4,7 @@
 #include "Text_Processor.hpp"
 #include "AVLtree.hpp"
 #include "RedBlackTree.hpp"
+#include "HashChaining.hpp"
 
 using namespace std;
 
@@ -56,7 +57,7 @@ int main(int arg, char* args[]){
         dict = new RedBlackTree<string, int>();
         break;
     case 3:
-        //TODO
+        dict = new HashChaining<string, int>();
         break;
     case 4:
         //TODO
