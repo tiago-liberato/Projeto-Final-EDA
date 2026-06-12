@@ -43,6 +43,7 @@ static vector<string> readFile(string path){
     string word;
 
     while(file >> word){
+        //Filtra as pontuações e transforma tudo em letras minúsculas
         word = cleanWord(toLower(word));
         if(!word.empty())
             words.push_back(word);
@@ -52,18 +53,32 @@ static vector<string> readFile(string path){
 }
 
 static void writeCSV(string name, Dictionary<string, int>* dict){
+
     ofstream file(name);
 
     if(!file.is_open()){
-        throw runtime_error("error: ");
+        throw runtime_error("error:  Could not open output file:"  + name);
     }
+
+    vector<pair<string, int>> aux;
 
     Iterator<string, int>* it = dict->getIterator();
 
     while(it->hasNext()){
         auto next = it->next();
-        file << next.first << ", " << next.second << "\n";
+        aux.push_back(next);
     }
+    
+    delete it;
+
+    sort(aux.begin(), aux.end(), [](const pair<string, int> a, const pair<string, int> b){
+        return a.first < b.first;
+    });
+    
+    for(auto& entrie: aux){
+        file << entrie.first << ", " << entrie.second << "\n";
+    }
+
 }
 
     

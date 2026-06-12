@@ -1,6 +1,8 @@
 #ifndef DICTIONARY
 #define DICTIONARY
 #include "../Iterator.hpp"
+using namespace std;
+
 /**
  * @brief  Interface para a estrutura de dados do dicionário
  * 
@@ -27,6 +29,7 @@ public:
     virtual V get(const K& key) const = 0;
     virtual bool contains(const K& key) const = 0;
     virtual std::size_t size() const = 0;
+    virtual size_t getComparison_Counter() const = 0;
 };
 
 #endif

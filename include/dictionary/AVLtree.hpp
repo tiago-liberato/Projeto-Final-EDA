@@ -34,6 +34,7 @@ private:
 
     Node* root;
     int _size = 0;
+    mutable size_t count = 0;
 
     /**
      * @brief  Classe interna responsável por fornecer a implementação do iterador para a árvore AVL
@@ -183,6 +184,8 @@ private:
         Node* aux = this->root;
 
         while(aux != nullptr) {
+            count ++;
+
             if(key < aux->key){
                 pais.push(aux);
                 aux = aux->left;
@@ -242,6 +245,7 @@ private:
         Node* aux = this->root;
         
         while (aux != nullptr) {
+            count++;
             if (key == aux->key) return aux;
             else if (key > aux->key) aux = aux->right;
             else aux = aux->left;
@@ -487,6 +491,16 @@ public:
      */
     Iterator<K, V>* getIterator() const override {
         return new AVLIterator(this->root);
+    }
+
+
+    /**
+     * @brief Retorna o número de comparações ao adicionar, procurar ou atualizar um nó
+     * 
+     * @return size_t variável count
+     */
+    size_t getComparison_Counter() const override{
+        return count;
     }
 
 

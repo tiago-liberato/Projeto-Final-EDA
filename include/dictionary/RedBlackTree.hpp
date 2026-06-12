@@ -1,5 +1,6 @@
 #ifndef RED_BLACK_TREE
 #define RED_BLACK_TREE
+#include <stack>
 using namespace std;
 
 enum Color{RED, BLACK};
@@ -33,6 +34,11 @@ private:
         ~Node() = default;
         
     };
+
+    Node* root;
+    Node* NIL;
+    int _size;
+    mutable size_t count = 0;
 
 
     /**
@@ -72,11 +78,6 @@ private:
             }
         
     };
-
-
-    Node* root;
-    Node* NIL;
-    int _size;
 
 
 
@@ -153,13 +154,14 @@ private:
 
         while(x != NIL){ //Enquanto x não chegar a NIL, continua percorrendo a árvore
             y = x;
+            count ++;
 
             if(novo->key < x->key){
                 x = x->left;
             }else if(novo->key > x->key){
                 x = x->right;
             }else{
-                throw runtime_error("Repeated key.")
+                throw runtime_error("Repeated key.");
             }
         }
 
@@ -242,6 +244,7 @@ private:
         Node* aux = this->root;
 
         while(aux != NIL && aux->key != key){
+            count ++;
             if(key < aux->key){
                 aux = aux->left;
             }else if(key > aux->key){
@@ -524,6 +527,15 @@ public:
     size_t size() const override{
         return _size;
     } 
+
+    /**
+     * @brief Retorna o número de comparações ao adicionar, procurar ou atualizar um nó
+     * 
+     * @return size_t variavel count
+     */
+    size_t getComparison_Counter() const override{
+        return count;
+    }
 
 
 };

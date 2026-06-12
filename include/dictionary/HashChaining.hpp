@@ -15,6 +15,7 @@ using namespace std;
  * @tparam K parametro para chave
  */
 template<typename K>
+
 struct Hasher {
     size_t operator()(const K& key) const {
         const unsigned char* bytes = reinterpret_cast<const unsigned char*>(&key);
@@ -63,6 +64,7 @@ private:
     size_t table_size;
     float max_load_factor;
     H hashing;
+    mutable size_t count = 0;
 
 
 
@@ -99,7 +101,7 @@ private:
 
 
     /**
-     * @brief Função que calcula o próximo número primo após x
+     * @brief Calcula o próximo número primo após x
      * 
      * @param x : número natural
      * @return size_t : numero primo
@@ -123,7 +125,7 @@ private:
 
 
     /**
-     * @brief Função que retorna o código hash de uma chave.
+     * @brief Retorna o código hash de uma chave.
      * 
      * @param key : Chave genérica
      * @return size_t : Número positivo no intervalo de [0...table_size-1]
@@ -135,7 +137,7 @@ private:
     
 
     /**
-     * @brief Função responsável por rearranjar a tabela atual em uma maior, 
+     * @brief Responsável por rearranjar a tabela atual em uma maior, 
      * chamada quando o fator de carga chega ao máximo.
      * 
      */
@@ -155,7 +157,7 @@ private:
 
     
     /**
-     * @brief Função que recebe uma chave e buscar o par chave-valor na tabela
+     * @brief Método const que recebe uma chave e buscar o par chave-valor na tabela
      * 
      * @param key parametro para a chave
      * @return pair<K, V>& : par chave-valor correspondente a chave
@@ -164,6 +166,7 @@ private:
         size_t hashcode = hash_code(key);
 
         for(const pair<K, V>& x: table[hashcode]){
+            count ++;
             if(key == x.first) return {x.first, x.second};
         }
 
@@ -171,16 +174,16 @@ private:
     }
     
     /**
-     * @brief Função que recebe uma chave e buscar o par chave-valor na tabela
-     * 
+     * @brief Recebe uma chave e buscar o par chave-valor na tabela e retorna uma referência 
      * @param key parametro para a chave
      * @return pair<K, V>& : par chave-valor correspondente a chave
      */
     pair<K, V>& find(const K& key){
         size_t hashcode = hash_code(key);
 
-        for(const pair<K, V>& x: table[hashcode]){
-            if(key == x.first) return {x.first, x.second};
+        for(pair<K, V>& x: table[hashcode]){
+            count++;
+            if(key == x.first) return x;
         }
 
         throw runtime_error("Key not found in hash table");
@@ -188,10 +191,11 @@ private:
     
     
     /**
-     * @brief Função privada que adiciona um par chave-valor na tabela
+     * @brief Método privado que adiciona um par chave-valor na tabela
      * 
      * @param key parametro para chave
      * @param value parametro para valor
+     * @throws runtime_error Se a chave já estiver presente na tabela
      */
     void add(const K& key, const V& value){
         
@@ -210,7 +214,7 @@ private:
     
     
     /**
-     * @brief Função privada que remove um par chave-valor na tabela
+     * @brief Método privado que remove um par chave-valor na tabela
      * 
      * @param key parametro para chave
      * @param value parametro para valor
@@ -229,7 +233,7 @@ private:
     }
 
     /**
-     * @brief Função privada que limpa a tabela
+     * @brief Método privado que limpa a tabela
      * 
      */
     void _clear(){
@@ -261,7 +265,7 @@ public:
 
 
     /**
-     * @brief Função que insere um par chave-valor na tabela
+     * @brief Método público que insere um par chave-valor na tabela
      * 
      * @param key parametro para chave
      * @param value parametro para valor
@@ -272,7 +276,7 @@ public:
 
 
     /**
-     * @brief Função que faz o update de um valor com base na sua chave
+     * @brief Método que faz o update de um valor com base na sua chave
      * 
      * @param key parametro para chave
      * @param value parametro para valor
@@ -282,8 +286,9 @@ public:
         aux.second = value;
     }
 
+
     /**
-     * @brief Função que remove um par chave-valor da tabela
+     * @brief Método público que remove um par chave-valor da tabela
      * 
      * @param key parametro para chave
      */
@@ -293,7 +298,7 @@ public:
 
 
     /**
-     * @brief Função que limpa a tabela;
+     * @brief Método público que limpa a tabela;
      * 
      */
     void clear() override{
@@ -302,7 +307,7 @@ public:
 
 
     /**
-     * @brief classe responsável por retornar o Iterador da Tabela
+     * @brief Método responsável por retornar o Iterador da Tabela
      * 
      * @return iterator<K, V> 
      */
@@ -312,7 +317,7 @@ public:
 
 
     /**
-     * @brief Função resposável por retornar um valor V atrelado a uma chave
+     * @brief Método resposável por retornar um valor V atrelado a uma chave
      * 
      * @param key parametro para chave
      * @return V valor atrelado a chave
@@ -324,7 +329,7 @@ public:
 
 
     /**
-     * @brief Função que verifica se uma chave está contida na tabela
+     * @brief Verifica se uma chave está contida na tabela
      * 
      * @param key parametro para chave
      * @return true : se está contida
@@ -341,12 +346,21 @@ public:
 
     
     /**
-     * @brief Função que retorna o número de elementos na tabela
+     * @brief Retorna o número de elementos na tabela
      * 
      * @return size_t 
      */
     size_t size()const override{
         return number_of_elements;
+    }
+
+    /**
+     * @brief retorna o numero de comparações feitas ao adicionar, procurar ou atualizar um par chave-valor na tabela 
+     * 
+     * @return size_t 
+     */
+    size_t getComparison_Counter() const override{
+        return count;
     }
 
  
