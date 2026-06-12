@@ -17,6 +17,10 @@ class AVLtree : public Dictionary<K, V>{
 
 private:
 
+    /**
+     * @brief struct que representa um nó da árvore AVL
+     * 
+     */
     struct Node{
         K key;
         V value;
@@ -31,6 +35,10 @@ private:
     Node* root;
     int _size = 0;
 
+    /**
+     * @brief  Classe interna responsável por fornecer a implementação do iterador para a árvore AVL
+     * 
+     */
     class AVLIterator : public Iterator<K, V> {
         private:
             stack<Node*> stack_nodes;
@@ -63,18 +71,35 @@ private:
 
 
 
-    // botei esses métodos aqui pq eles são auxiliares em outras funções, então eles precisam vir antes
-
-
+    /**
+     * @brief Retorna a altura de um nó na árvore
+     * 
+     * @param node parametro para o nó
+     * @return int altura do nó
+     */
     int height(Node* node){
         return (node == nullptr) ? 0 : node->height;
     }
 
+
+    /**
+     * @brief Calcula o balanço de um nó
+     * 
+     * @param node parametro para o nó
+     * @return int balanço do nó
+     */
     int balance(Node* node){
         if(node == nullptr) return 0;
         return (height(node->right) - height(node->left));
     }
 
+
+    /**
+     * @brief Realiza uma rotação a esquerda em um nó
+     * 
+     * @param node parametro para o nó
+     * @return Node* ponteiro para o nó filho após a rotação
+     */
     Node* leftRotation(Node* node){
         Node* y = node->right;
         node->right = y->left;
@@ -88,6 +113,12 @@ private:
     }
 
 
+    /**
+     * @brief Realiza uma rotação a direita em um nó
+     * 
+     * @param node parametro para o nó
+     * @return Node* ponteiro para o nó filho após a rotação
+     */
     Node* rightRotation(Node* node){
         Node* y = node->left;
         node->left = y->right;
@@ -101,6 +132,12 @@ private:
     }
 
 
+    /**
+     * @brief Realiza o rebalanceamnto da árvore após uma inserção
+     * 
+     * @param node parametro do nó inserido
+     * @return Node* ponteiro para o nó após o rebalanceamento
+     */
     Node* fixUpNode(Node* node){ 
         int b = balance(node);
         
@@ -128,6 +165,13 @@ private:
         return node;
     }
 
+
+    /**
+     * @brief Método privado que adiciona um novo nó na árvore
+     * 
+     * @param key parametro para a chave do novo nó
+     * @param value parametro para o valor do novo nó
+     */
     void add(const K& key, const V& value) {
         if(this->root == nullptr) {
             this->root = new Node(key, value, 1, nullptr, nullptr);
@@ -146,7 +190,7 @@ private:
                 pais.push(aux);
                 aux = aux->right;
             }else{
-                throw runtime_error("Chave Repetida");
+                throw runtime_error("Repeated key.");
             }
         }
 
@@ -186,6 +230,14 @@ private:
         _size++;
     }
 
+
+    /**
+     * @brief Busca um nó na árvore com base na sua chave, 
+     * se não for retorna nullptr
+     * 
+     * @param key parametro para a chave
+     * @return Node* ponteiro para o nó encontrado
+     */
     Node* search(const K& key) const {
         Node* aux = this->root;
         
@@ -194,9 +246,16 @@ private:
             else if (key > aux->key) aux = aux->right;
             else aux = aux->left;
         }
-    return nullptr;
+
+        return nullptr;
+
     }
 
+
+    /**
+     * @brief Método privado que limpa a árvore
+     * 
+     */
     void _clear(){
         if(this->root == nullptr) return;
 
@@ -217,6 +276,13 @@ private:
         this->_size = 0;
     }
 
+
+    /**
+     * @brief Método privado que realiza a atualização de uma valor com base na sua chave
+     * 
+     * @param key parametro para a chave
+     * @param value parametro para o novo valor
+     */
     void _update(const K& key, const V& value) {
         Node* modificado = search(key);  
         if (modificado != nullptr) {
@@ -227,6 +293,14 @@ private:
         }
     }
 
+
+    /**
+     * @brief Método privado que remove um nó da árvore, segue os seguintes passos:
+     *          (1) Se o nó não existir lança uma exceção
+     *          (2) Se existir, remove o nó e rebalanceia a árvore
+     * 
+     * @param key parametro para a chave do nó
+     */
     void _remove(const K& key) {
         if (this->root == nullptr) return; // Árvore vazia, nada a fazer
 
@@ -311,46 +385,106 @@ private:
 
 public:
 
+
+    /**
+     * @brief Construtor da classe AVLtree
+     * 
+     */
     AVLtree(){
         this->root = nullptr;
     }
 
+
+    /**
+     * @brief Destrutor da classe AVLtree
+     * 
+     */
     ~AVLtree() {
         _clear();
     }
+
+
+    /**
+     * @brief Método público que insere um novo nó na árvore
+     * 
+     * @param key parametro para a chave do novo nó
+     * @param value parametro para o valor do novo nó
+     */
     void insert(const K& key, const V& value) override {
         add( key, value);
     }
 
+
+    /**
+     * @brief Método público que atualiza o valor de um nó com base na sua chave
+     * 
+     * @param key parametro para chave
+     * @param value paraetro para valor
+     */
     void update(const K& key, const V& value) override {
         _update(key, value);
     }
 
+
+    /**
+     * @brief Método público que remove um nó da árvore
+     * 
+     * @param key chave do nó a ser removido
+     */
     void remove(const K& key) override {
         _remove(key);
     }
 
+
+    /**
+     * @brief Método privado que limpa a árvore
+     * 
+     */
     void clear() override {
         _clear();
     }
 
-    // Retorna o valor relacionado a chave 
+    
+    /**
+     * @brief retorna o valor relacionado a uma determinada chave na árvore,
+     * caso não pertença a árvore lança uma exceção.
+     * 
+     * @param key parametro para chave
+     * @return V valor relacionado a chave
+     */
     V get (const K& key) const override { 
         Node* result = search(key);
         if (result != nullptr) return result->value;
         throw runtime_error("Key not found in tree");
     }
 
+    /**
+     * @brief retorna a quantidade de nós na árvore
+     * 
+     * @return size_t 
+     */
     size_t size() const override {
         return _size;
     }
 
-    // Retorna se existe ou não a chave no dicionário
+    
+    /**
+     * @brief Verifica se uma chave existe na árvore
+     * 
+     * @param key parametro para a chave
+     * @return true Se a chave pertence a árvore
+     * @return false Se a chave não pertence a árvore
+     */
     bool contains (const K& key) const override {
         return search(key) != nullptr;
     }
 
-    //Retorna uma instância da classe AVLIterator
+    
+    /**
+     * @brief retorna o iterador da árvore AVL
+     * 
+     * @return Iterator<K, V>* 
+     */
     Iterator<K, V>* getIterator() const override {
         return new AVLIterator(this->root);
     }

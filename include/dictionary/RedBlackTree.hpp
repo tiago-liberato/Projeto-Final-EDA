@@ -16,6 +16,10 @@ class RedBlackTree : public Dictionary<K, V>{
 
 private:
 
+    /**
+     * @brief Struct que representa o nó da árvore Rubro-Negra
+     * 
+     */
     struct Node{
         K key;
         V value;
@@ -30,6 +34,11 @@ private:
         
     };
 
+
+    /**
+     * @brief Classe que fornece a implementação do Iterador da RBtree
+     * 
+     */
     class RBIterator : public Iterator<K, V>{
         private:
             stack<Node*> stack_nodes;
@@ -64,12 +73,18 @@ private:
         
     };
 
+
     Node* root;
     Node* NIL;
     int _size;
 
 
 
+    /**
+     * @brief Realizar uma rotação a esquerda no nó
+     * 
+     * @param node parametro para o nó
+     */
     void leftRotation(Node* node){
 
         Node* y = node->right;
@@ -95,6 +110,12 @@ private:
     }
 
 
+
+    /**
+     * @brief Realizar uma rotação a direita no nó
+     * 
+     * @param node parametro para o nó
+     */
     void rightRotation(Node* node){
 
         Node* y = node->left;
@@ -119,7 +140,12 @@ private:
     }
 
 
-
+    /**
+     * @brief Método privado que adiciona um nó na árvore
+     * 
+     * @param key parametro para chave
+     * @param value parametro para valor
+     */
     void add(const K& key, const V& value){
         Node* novo = new Node(key, value, this->NIL);
         Node* x = root; 
@@ -133,7 +159,7 @@ private:
             }else if(novo->key > x->key){
                 x = x->right;
             }else{
-                return;
+                throw runtime_error("Repeated key.")
             }
         }
 
@@ -151,6 +177,12 @@ private:
         _size ++;
     }
 
+
+    /**
+     * @brief Realiza as operações de rebelanceamento e recolorações na árvore após inserção
+     * 
+     * @param x parametro para o nó inserido
+     */
     void RBInsertFixUP(Node* x){
 
             while(x->parent->color == RED){
@@ -200,6 +232,12 @@ private:
     }
 
 
+    /**
+     * @brief Busca um nó na árvore 
+     * 
+     * @param key parametro para chave
+     * @return Node* ponteiro para o nó
+     */
     Node* search(const K& key) const{
         Node* aux = this->root;
 
@@ -214,6 +252,13 @@ private:
         return aux;
     }
 
+
+    /**
+     * @brief Realiza a atualização do valor de um nó com base na sua chave
+     * 
+     * @param key parametro para chave
+     * @param value parametro para o novo valor
+     */
     void _update(const K& key, const V& value){
         Node* aux = search(key);
 
@@ -222,6 +267,12 @@ private:
         aux->value = value;
     }
 
+
+    /**
+     * @brief Remove um nó da árvore com base na sua chave
+     * 
+     * @param key parametro para chave
+     */
     void RemoveNode(const K& key){
             Node* node = search(key);
 
@@ -264,6 +315,11 @@ private:
         }
 
 
+    /**
+     * @brief Realiza as operações de rebalanceamento e recoloração da árvore após remoção
+     * 
+     * @param x parametro para o descendente do nó removido
+     */
     void fixRemoveNode(Node* x){
 
         while(x != root && x->color == BLACK){
@@ -323,6 +379,13 @@ private:
         x->color = BLACK;
     }
 
+
+    /**
+     * @brief Busca o nó com valor mínimo de uma árvore
+     * 
+     * @param node parametro para a raiz da árvore
+     * @return Node* ponteiro para o nó mínimo
+     */
     Node* findMinimum(Node* node){
         while(node->left != NIL)
             node = node->left;
@@ -330,7 +393,10 @@ private:
     }
 
 
-
+    /**
+     * @brief Método privado que limpa a árvore
+     * 
+     */
     void _clear() {
 
         if(this->root == NIL) return;
@@ -354,47 +420,107 @@ private:
 
 public:
 
+    /**
+     * @brief Construtor da classe RedBlackTree
+     * 
+     */
     RedBlackTree(){
         NIL = new Node();
         root = NIL;
         _size = 0;
     }
 
+    
+    /**
+     * @brief Destrutor da classe RedBlackTree
+     * 
+     */
     ~RedBlackTree(){
         _clear();
         delete NIL;
     }
 
+
+    /**
+     * @brief Método público que insere um nó na árvore
+     * 
+     * @param key parametro para chave
+     * @param value parametro para valor
+     */
     void insert(const K& key, const V& value) override{
         add(key, value);
     }
 
+
+    /**
+     * @brief Método público que atualiza o valor de um nó com base na sua chave
+     * 
+     * @param key parametro para chave
+     * @param value parametro para valor
+     */
     void update(const K& key, const V& value) override{
         _update(key, value);
     }
 
+
+    /**
+     * @brief Método público que remove um nó da árvore
+     * 
+     * @param key parametro para chave
+     */
     void remove(const K& key) override{
         RemoveNode(key);
     }
 
+
+    /**
+     * @brief Retorna o Iterador da árvore Rubro-Negra
+     * 
+     * @return Iterator<K, V>* 
+     */
     Iterator<K, V>* getIterator() const override{
         return new RBIterator(this->root, this->NIL);
     }
 
+
+    /**
+     * @brief Retorna o valor associado a determinada chave
+     * 
+     * @param key parametro para chave
+     * @return V valor associado a chave
+     */
     V get(const K& key) const override{
         Node* x = search(key);
         return (x == NIL ? throw runtime_error("Key not found in tree"): x->value);
     }
 
+
+    /**
+     * @brief Verifica se uma chave pertence a árvore
+     * 
+     * @param key parametro para chave
+     * @return true Se a chave pertence a árvore
+     * @return false Se a chave não pertence a árvore
+     */
     bool contains(const K& key) const override{
         Node* x = search(key);
         return x != NIL;
     }
 
+    /**
+     * @brief Método público que limpa a árvore
+     * 
+     */
     void clear() override{
         _clear();
     }
 
+
+    /**
+     * @brief Retorna a quantidade de nós na árvore
+     * 
+     * @return size_t 
+     */
     size_t size() const override{
         return _size;
     } 
