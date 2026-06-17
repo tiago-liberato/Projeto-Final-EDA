@@ -5,6 +5,7 @@
 #include "AVLtree.hpp"
 #include "RedBlackTree.hpp"
 #include "HashChaining.hpp"
+#include "HashOpenAdr.hpp"
 
 using namespace std;
 
@@ -60,7 +61,7 @@ int main(int arg, char* args[]){
         dict = new HashChaining<string, int>();
         break;
     case 4:
-        //TODO
+        dict = new HashOpenAdr<string, int>();
         break;
 
     default:

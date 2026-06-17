@@ -99,7 +99,7 @@ private:
             advance();
         }
 
-        bool hasNext() const override {
+        bool hasNext() override {
             return m_pos < m_ref.size();
         }
 

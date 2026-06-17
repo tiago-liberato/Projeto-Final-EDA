@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include "Dictionary.hpp"
 #include "Iterator.hpp"
 #include <algorithm>
@@ -18,12 +19,26 @@ class Text_Processor{
 private:
 
     static string toLower(string word){
+
         transform(word.begin(), word.end(), word.begin(), ::tolower);
+        
+        map<string, string> table = {
+        {"Á","á"},{"À","à"},{"Â","â"},{"Ã","ã"},
+        {"É","é"},{"Ê","ê"},{"Í","í"},{"Ó","ó"},
+        {"Ô","ô"},{"Õ","õ"},{"Ú","ú"},{"Ü","ü"},
+        {"Ç","ç"}
+        };
+    
+        for(auto& [upper, lower] : table){
+            size_t pos;
+            while((pos = word.find(upper)) != string::npos)
+                word.replace(pos, upper.size(), lower);
+        }
         return word;
     }
 
     static string cleanWord(string word){
-        word.erase(remove_if(word.begin(), word.end(), [](char c){
+        word.erase(remove_if(word.begin(), word.end(), [](unsigned char c){
             return ispunct(c) && c != '-';
         }), word.end());
 
@@ -42,7 +57,13 @@ static vector<string> readFile(string path){
     vector<string> words;
     string word;
 
+    size_t pos;
+    
     while(file >> word){
+
+        while ((pos = word.find("--")) != string::npos)
+            word.erase(pos, 2);
+
         //Filtra as pontuações e transforma tudo em letras minúsculas
         word = cleanWord(toLower(word));
         if(!word.empty())
