@@ -494,7 +494,7 @@ public:
      */
     V get(const K& key) const override{
         Node* x = search(key);
-        return (x == NIL ? throw runtime_error("Key not found in tree"): x->value);
+        return (x == NIL ? throw out_of_range("Key not found in tree"): x->value);
     }
 
 

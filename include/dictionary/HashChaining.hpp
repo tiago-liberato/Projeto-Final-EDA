@@ -170,7 +170,7 @@ private:
             if(key == x.first) return {x.first, x.second};
         }
 
-        throw runtime_error("Key not found in hash table");
+        throw out_of_range("Key not found in hash table");
     }
     
     /**
@@ -186,7 +186,7 @@ private:
             if(key == x.first) return x;
         }
 
-        throw runtime_error("Key not found in hash table");
+        throw out_of_range("Key not found in hash table");
     }
     
     
@@ -339,7 +339,7 @@ public:
         try{
             search(key);
             return true;
-        }catch(runtime_error&){
+        }catch(out_of_range&){
             return false;
         }
     }

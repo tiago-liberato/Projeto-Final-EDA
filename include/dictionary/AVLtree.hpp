@@ -459,7 +459,7 @@ public:
     V get (const K& key) const override { 
         Node* result = search(key);
         if (result != nullptr) return result->value;
-        throw runtime_error("Key not found in tree");
+        throw out_of_range("Key not found in tree");
     }
 
     /**

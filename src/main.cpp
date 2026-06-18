@@ -74,11 +74,10 @@ int main(int arg, char* args[]){
 
 
 for(string word: words){
-    if(dict->contains(word)){
+    try {
         int aux = dict->get(word);
-        aux ++;
-        dict->update(word, aux);
-    }else{
+        dict->update(word, aux + 1);
+    } catch(const out_of_range&) {
         dict->insert(word, 1);
     }
 }
