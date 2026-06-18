@@ -1,6 +1,8 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <fstream>
+#include <filesystem>
 #include "Text_Processor.hpp"
 #include "AVLtree.hpp"
 #include "RedBlackTree.hpp"
@@ -81,7 +83,45 @@ for(string word: words){
     }
 }
 
-Text_Processor::writeCSV("result.csv", dict);
+
+//Guarda o número de comparações necessárias para montar a estrutura
+size_t comparisons = dict->getComparison_Counter();
+
+// Nome do arquivo de métricas baseado no livro
+string bookName = file.substr(file.find_last_of("/\\") + 1);
+bookName = bookName.substr(0, bookName.find_last_of('.'));
+string csvMetrics = "result/" + bookName + "_Metricas.csv";
+
+filesystem::create_directory("result/");
+
+Text_Processor::writeCSV("result/" + bookName + "_result.csv", dict);
+
+map<string, size_t> metrics;
+
+ifstream fin(csvMetrics);
+if(fin.is_open()){
+    string line;
+    getline(fin, line); // pula cabeçalho
+    while(getline(fin, line)){
+        size_t comma = line.find(',');
+        if(comma != string::npos)
+            metrics[line.substr(0, comma)] = stoull(line.substr(comma + 1));
+    }
+    fin.close();
+}
+
+
+// Atualiza só a estrutura atual e salva tudo
+metrics[command] = comparisons;
+ofstream fout(csvMetrics);
+
+fout << "estrutura,comparacoes\n";
+
+for(auto& [est, comp] : metrics)
+    fout << est << "," << comp << "\n";
+
+
+
 
 delete dict;
 return 0;

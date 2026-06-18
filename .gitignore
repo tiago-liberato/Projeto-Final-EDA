@@ -68,6 +68,7 @@ vcpkg_installed/
 Testing/
 .cache/
 
-
+result/
+books/
 *.txt
 *.csv
