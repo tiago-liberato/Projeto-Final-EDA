@@ -5,41 +5,30 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <map>
 #include "Dictionary.hpp"
 #include "Iterator.hpp"
 #include <algorithm>
+#include <cctype> 
+#include <sstream> 
+
+#include <boost/locale.hpp> 
+
 using namespace std;
 
-/**
- * @brief  Classe reponsável por processar, ler e escrever arquivos
- * 
- */
-class Text_Processor{
+class Text_Processor {
 private:
 
-    static string toLower(string word){
-
-        transform(word.begin(), word.end(), word.begin(), ::tolower);
-        
-        map<string, string> table = {
-        {"Á","á"},{"À","à"},{"Â","â"},{"Ã","ã"},
-        {"É","é"},{"Ê","ê"},{"Í","í"},{"Ó","ó"},
-        {"Ô","ô"},{"Õ","õ"},{"Ú","ú"},{"Ü","ü"},
-        {"Ç","ç"}
-        };
-    
-        for(auto& [upper, lower] : table){
-            size_t pos;
-            while((pos = word.find(upper)) != string::npos)
-                word.replace(pos, upper.size(), lower);
-        }
-        return word;
-    }
-
     static string cleanWord(string word){
+        vector<string> specialChars = {"«", "»", "“", "”", "•", "‘", "’", "\xEF\xBF\xBD", "—", "–"};
+        for(const string& s : specialChars){
+            size_t pos;
+            while((pos = word.find(s)) != string::npos){
+                word.erase(pos, s.length());
+            }
+        }
+
         word.erase(remove_if(word.begin(), word.end(), [](unsigned char c){
-            return ispunct(c) && c != '-';
+            return (c <= 127 && ispunct(c) && c != '-') || isdigit(c);
         }), word.end());
 
         return word;
@@ -54,20 +43,36 @@ static vector<string> readFile(string path){
         throw runtime_error("error: Invalid File");
     }
 
-    vector<string> words;
-    string word;
-
-    size_t pos;
+    boost::locale::generator gen;
+    std::locale loc = gen("pt_BR.UTF-8");
     
-    while(file >> word){
+    vector<string> words;
+    string line;
+    
+    while(getline(file, line)){
+        size_t pos;
+        while ((pos = line.find("--")) != string::npos) {
+            line.replace(pos, 2, " ");
+        }
 
-        while ((pos = word.find("--")) != string::npos)
-            word.erase(pos, 2);
+        stringstream ss(line);
+        string word;
+        
+        while(ss >> word){
+            word = boost::locale::to_lower(word, loc);
+            
+            word = cleanWord(word);
 
-        //Filtra as pontuações e transforma tudo em letras minúsculas
-        word = cleanWord(toLower(word));
-        if(!word.empty())
-            words.push_back(word);
+            while(!word.empty() && word.front() == '-') {
+                word.erase(word.begin());
+            }
+            while(!word.empty() && word.back() == '-') {
+                word.pop_back();
+            }
+
+            if(!word.empty())
+                words.push_back(word);
+        }
     }
 
     return words;
@@ -78,11 +83,10 @@ static void writeCSV(string name, Dictionary<string, int>* dict){
     ofstream file(name);
 
     if(!file.is_open()){
-        throw runtime_error("error:  Could not open output file:"  + name);
+        throw runtime_error("error: Could not open output file: " + name);
     }
 
     vector<pair<string, int>> aux;
-
     Iterator<string, int>* it = dict->getIterator();
 
     while(it->hasNext()){
@@ -92,17 +96,20 @@ static void writeCSV(string name, Dictionary<string, int>* dict){
     
     delete it;
 
-    sort(aux.begin(), aux.end(), [](const pair<string, int> a, const pair<string, int> b){
-        return a.first < b.first;
+    boost::locale::generator gen;
+    std::locale loc = gen("pt_BR.UTF-8");
+
+    sort(aux.begin(), aux.end(), [&loc](const pair<string, int>& a, const pair<string, int>& b){
+        return std::use_facet<std::collate<char>>(loc).compare(
+            a.first.data(), a.first.data() + a.first.size(),
+            b.first.data(), b.first.data() + b.first.size()
+        ) < 0;
     });
     
     for(auto& entrie: aux){
         file << entrie.first << ", " << entrie.second << "\n";
     }
-
 }
-
-    
 
 };
 

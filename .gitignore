@@ -22,6 +22,12 @@
 *.dylib
 *.dll
 *.so.*
+*.zip
+*.txt
+*.csv
+dicionario_app
+livros-testes/
+
 
 
 # Fortran module files
