@@ -86,17 +86,22 @@ for(string word: words){
 //Guarda o número de comparações necessárias para montar a estrutura
 size_t comparisons = dict->getComparison_Counter();
 
-// Nome do arquivo de métricas baseado no livro
+
+// Nome do arquivo de métricas 
 string bookName = file.substr(file.find_last_of("/\\") + 1);
 bookName = bookName.substr(0, bookName.find_last_of('.'));
 string csvMetrics = "result/" + bookName + "_Metricas.csv";
 
+
 filesystem::create_directory("result/");
+
 
 Text_Processor::writeCSV("result/" + bookName + "_result.csv", dict);
 
+
 map<string, size_t> metrics;
 
+//Cópia os dados do CSV de métricas para o map
 ifstream fin(csvMetrics);
 if(fin.is_open()){
     string line;
@@ -116,9 +121,16 @@ ofstream fout(csvMetrics);
 
 fout << "estrutura,comparacoes\n";
 
-for(auto& [est, comp] : metrics)
+for(auto& [est, comp] : metrics){
     fout << est << "," << comp << "\n";
+}
 
+//verifica se todas as métricas foram coletadas e gera os gráficos
+if(metrics.size() == 4){
+    string comand = "python -u generate_charts.py \"result/" + bookName + "_Metricas.csv\"";
+    cout << "Comando: " << comand << endl;
+    system(comand.c_str());
+}
 
 
 

@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <cctype> 
 #include <sstream> 
-
 #include <boost/locale.hpp> 
 
 using namespace std;
