@@ -125,15 +125,6 @@ for(auto& [est, comp] : metrics){
     fout << est << "," << comp << "\n";
 }
 
-//verifica se todas as métricas foram coletadas e gera os gráficos
-if(metrics.size() == 4){
-    string comand = "python -u generate_charts.py \"result/" + bookName + "_Metricas.csv\"";
-    cout << "Comando: " << comand << endl;
-    system(comand.c_str());
-}
-
-
-
 delete dict;
 return 0;
 

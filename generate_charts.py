@@ -27,7 +27,7 @@ def main():
                 tempos.append(float(row["tempo"]))
                 tem_tempo = True
 
-    cores = ["#4C72B0", "#DD4444", "#55A868", "#C44E52"]
+    cores = ["#1D3557", "#457B9D", "#A8DADC", "#14213D"]
 
     plt.figure(figsize=(8, 5))
     plt.bar(labels, comparacoes, color=cores)
