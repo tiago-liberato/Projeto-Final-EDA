@@ -76,5 +76,6 @@ Testing/
 
 result/
 books/
+graficos/
 *.txt
 *.csv
