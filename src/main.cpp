@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <filesystem>
+#include <chrono>
 #include "Text_Processor.hpp"
 #include "AVLtree.hpp"
 #include "RedBlackTree.hpp"
@@ -72,6 +73,7 @@ int main(int arg, char* args[]){
         return 1;
 }
 
+auto start = chrono::high_resolution_clock::now();
 
 for(string word: words){
     try {
@@ -81,6 +83,9 @@ for(string word: words){
         dict->insert(word, 1);
     }
 }
+
+auto end = chrono::high_resolution_clock::now();
+auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
 
 
 //Guarda o número de comparações necessárias para montar a estrutura
@@ -99,30 +104,34 @@ filesystem::create_directory("result/");
 Text_Processor::writeCSV("result/" + bookName + "_result.csv", dict);
 
 
-map<string, size_t> metrics;
+map<string, pair<size_t, long long>> metrics;
 
 //Cópia os dados do CSV de métricas para o map
-ifstream fin(csvMetrics);
-if(fin.is_open()){
+ifstream fin2(csvMetrics);
+if(fin2.is_open()){
     string line;
-    getline(fin, line); // pula cabeçalho
-    while(getline(fin, line)){
-        size_t comma = line.find(',');
-        if(comma != string::npos)
-            metrics[line.substr(0, comma)] = stoull(line.substr(comma + 1));
+    getline(fin2, line); // pula cabeçalho
+    while(getline(fin2, line)){
+        size_t c1 = line.find(',');
+        size_t c2 = line.find(',', c1 + 1);
+        if(c1 != string::npos && c2 != string::npos){
+            string est = line.substr(0, c1);
+            size_t comp = stoull(line.substr(c1 + 1, c2 - c1 - 1));
+            long long tempo = stoll(line.substr(c2 + 1));
+            metrics[est] = {comp, tempo};
+        }
     }
-    fin.close();
+    fin2.close();
 }
 
+// Atualiza a estrutura atual
+metrics[command] = {comparisons, duration.count()};
 
-// Atualiza só a estrutura atual e salva tudo
-metrics[command] = comparisons;
+// Escreve o CSV
 ofstream fout(csvMetrics);
-
-fout << "estrutura,comparacoes\n";
-
-for(auto& [est, comp] : metrics){
-    fout << est << "," << comp << "\n";
+fout << "estrutura,comparacoes,tempo_ms\n";
+for(auto& [est, data] : metrics){
+    fout << est << "," << data.first << "," << data.second << "\n";
 }
 
 delete dict;

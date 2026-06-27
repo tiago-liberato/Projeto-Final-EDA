@@ -5,43 +5,8 @@
 #include <vector>
 #include <stdexcept>
 #include "Dictionary.hpp"
+#include "HashChaining.hpp"
 
-/**
- * @brief Struct Hasher genérica que sobrecarrega o operador()
- * 
- * @tparam K parametro para chave
- */
-template<typename K>
-
-struct Hasher {
-    size_t operator()(const K& key) const {
-        const unsigned char* bytes = reinterpret_cast<const unsigned char*>(&key);
-        size_t hash = 14695981039346656037ULL;
-        for (size_t i = 0; i < sizeof(K); i++) {
-            hash ^= bytes[i];
-            hash *= 1099511628211ULL;
-        }
-        return hash;
-    }
-};
-
-
-/**
- * @brief Struct Hasher para String que sobrecarrega o operador()
- * 
- * @tparam  
- */
-template<>
-struct Hasher<string> {
-    size_t operator()(const string& key) const {
-        size_t hash = 14695981039346656037ULL; // FNV offset basis
-        for (unsigned char c : key) {
-            hash ^= c;
-            hash *= 1099511628211ULL; // FNV prime
-        }
-        return hash;
-    }
-};
 
 enum class Status {
     EMPTY,

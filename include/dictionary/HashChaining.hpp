@@ -37,10 +37,12 @@ struct Hasher {
 template<>
 struct Hasher<string> {
     size_t operator()(const string& key) const {
-        size_t code = 0, RADIX = 127;
-        for (size_t i = 0; i < key.size(); i++)
-            code = (code * RADIX) + key[i];
-        return code;
+        size_t hash = 14695981039346656037ULL; // FNV offset basis
+        for (unsigned char c : key) {
+            hash ^= c;
+            hash *= 1099511628211ULL; // FNV prime
+        }
+        return hash;
     }
 };
 

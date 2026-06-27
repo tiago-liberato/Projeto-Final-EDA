@@ -3,7 +3,7 @@ import os
 import csv
 import matplotlib.pyplot as plt
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 
 def main():
     if len(sys.argv) < 2:
@@ -11,6 +11,7 @@ def main():
         sys.exit(1)
 
     caminho = sys.argv[1]
+    caminho = os.path.abspath(sys.argv[1])
     nome_base = os.path.basename(caminho).replace(".csv", "")
 
     os.makedirs("graficos", exist_ok=True)
@@ -23,8 +24,8 @@ def main():
         for row in reader:
             labels.append(row["estrutura"].strip())
             comparacoes.append(int(row["comparacoes"]))
-            if "tempo" in row:
-                tempos.append(float(row["tempo"]))
+            if "tempo_ms" in row:
+                tempos.append(float(row["tempo_ms"]))
                 tem_tempo = True
 
     cores = ["#1D3557", "#457B9D", "#A8DADC", "#14213D"]
