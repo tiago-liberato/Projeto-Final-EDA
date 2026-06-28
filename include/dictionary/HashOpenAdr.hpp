@@ -5,15 +5,53 @@
 #include <vector>
 #include <stdexcept>
 #include "Dictionary.hpp"
-#include "HashChaining.hpp"
 
+/**
+ * @brief Struct Hasher genérica que sobrecarrega o operador()
+ * * @tparam K parametro para chave
+ */
+template<typename K>
+struct Hasher {
+    size_t operator()(const K& key) const {
+        const unsigned char* bytes = reinterpret_cast<const unsigned char*>(&key);
+        size_t hash = 14695981039346656037ULL;
+        for (size_t i = 0; i < sizeof(K); i++) {
+            hash ^= bytes[i];
+            hash *= 1099511628211ULL;
+        }
+        return hash;
+    }
+};
 
+/**
+ * @brief Struct Hasher para String que sobrecarrega o operador()
+ * */
+template<>
+struct Hasher<string> {
+    size_t operator()(const string& key) const {
+        size_t hash = 14695981039346656037ULL; // FNV offset basis
+        for (unsigned char c : key) {
+            hash ^= c;
+            hash *= 1099511628211ULL; // FNV prime
+        }
+        return hash;
+    }
+};
+
+/**
+ * @brief Enum que representa o status de ocupação de um slot na tabela
+ */
 enum class Status {
     EMPTY,
     ACTIVE,
     DELETED
 };
 
+/**
+ * @brief Struct que representa uma posição (slot) na tabela hash
+ * * @tparam K parametro para chave
+ * @tparam V parametro para valor
+ */
 template<typename K, typename V>
 struct Slot {
     K      key;
@@ -21,6 +59,12 @@ struct Slot {
     Status status { Status::EMPTY };
 };
 
+/**
+ * @brief Classe que implementa uma tabela Hash com tratamento de colisão por endereçamento aberto (Duplo Hashing)
+ * * @tparam K parametro para chave
+ * @tparam V parametro para valor
+ * @tparam Hash parametro para a estrutura de hashing 
+ */
 template<typename K, typename V, typename Hash =  Hasher<K>>
 class HashOpenAdr : public Dictionary<K, V> {
 
@@ -32,6 +76,11 @@ private:
     Hash                    m_hashing;
     mutable size_t          m_comparison_count = 0;
 
+    /**
+     * @brief Calcula o próximo número primo após x
+     * * @param x : número natural
+     * @return size_t : numero primo
+     */
     size_t get_next_prime(size_t x) {
         if (x <= 2) return 3;
         if (x % 2 == 0) x++;
@@ -45,6 +94,12 @@ private:
         }
     }
 
+    /**
+     * @brief Retorna o código hash de uma chave utilizando Duplo Hashing
+     * * @param k : chave a ser calculada
+     * @param i : número da tentativa (step) para resolver a colisão
+     * @return size_t : índice calculado na tabela
+     */
     size_t hash_code(const K& k, size_t i) const {
         size_t h  = m_hashing(k);
         size_t h1 = h % m_table_size;
@@ -52,6 +107,11 @@ private:
         return (h1 + i * h2) % m_table_size;
     }
 
+    /**
+     * @brief Busca o índice de uma chave na tabela
+     * * @param k : chave genérica
+     * @return int : índice da chave na tabela ou -1 se não encontrar
+     */
     int aux_search(const K& k) const {
         for (size_t i = 0; i < m_table_size; ++i) {
             size_t           idx = hash_code(k, i);
@@ -70,6 +130,11 @@ private:
         return -1;
     }
 
+    /**
+     * @brief Método interno responsável pela lógica de inserção na tabela
+     * * @param key parametro para chave
+     * @param value parametro para valor
+     */
     void insert_internal(const K& key, const V& value) {
         for (size_t i = 0; i < m_table_size; ++i) {
             size_t pos = hash_code(key, i);
@@ -82,11 +147,17 @@ private:
         throw std::runtime_error("insert_internal: tabela sem espaço disponível.");
     }
 
+    /**
+     * @brief Classe interna responsável por fornecer a implementação do iterador para a tabela
+     */
     class HashIterator : public Iterator<K, V> {
     private:
         const std::vector<Slot<K,V>>& m_ref;
         size_t                         m_pos;
 
+        /**
+         * @brief Avança o iterador até encontrar o próximo slot ativo
+         */
         void advance() {
             while (m_pos < m_ref.size() &&
                    m_ref[m_pos].status != Status::ACTIVE) {
@@ -118,6 +189,11 @@ private:
 
 public:
 
+    /**
+     * @brief Construtor da Classe HashOpenAdr
+     * * @param tbsize : Valor inicial para o tamanho da tabela
+     * @param loadFactor : Fator de carga máximo suportado
+     */
     explicit HashOpenAdr(size_t tbsize = 13, float loadFactor = 0.7f)
         : m_max_load_factor(loadFactor)
     {
@@ -125,8 +201,16 @@ public:
         m_table.assign(m_table_size, Slot<K,V>());
     }
 
+    /**
+     * @brief Destrutor da classe
+     */
     ~HashOpenAdr() override = default;
 
+    /**
+     * @brief Método público que insere um par chave-valor na tabela
+     * * @param key parametro para chave
+     * @param value parametro para valor
+     */
     void insert(const K& key, const V& value) override {
         if (contains(key)) {
             throw std::invalid_argument(
@@ -138,6 +222,11 @@ public:
         insert_internal(key, value);
     }
 
+    /**
+     * @brief Método que faz o update de um valor com base na sua chave
+     * * @param key parametro para chave
+     * @param value parametro para valor
+     */
     void update(const K& key, const V& value) override {
         int idx = aux_search(key);
         if (idx == -1) {
@@ -147,6 +236,10 @@ public:
         m_table[idx].value = value;
     }
 
+    /**
+     * @brief Método público que remove um par chave-valor da tabela marcando o slot como deletado
+     * * @param key parametro para chave
+     */
     void remove(const K& key) override {
         int idx = aux_search(key);
         if (idx == -1) {
@@ -157,6 +250,9 @@ public:
         --m_number_of_elements;
     }
 
+    /**
+     * @brief Método público que limpa a tabela esvaziando todos os slots
+     */
     void clear() override {
         for (auto& slot : m_table) {
             slot.status = Status::EMPTY;
@@ -164,6 +260,11 @@ public:
         m_number_of_elements = 0;
     }
 
+    /**
+     * @brief Método resposável por retornar um valor V atrelado a uma chave
+     * * @param key parametro para chave
+     * @return V valor atrelado a chave
+     */
     V get(const K& key) const override {
         int idx = aux_search(key);
         if (idx == -1) {
@@ -173,35 +274,70 @@ public:
         return m_table[idx].value;
     }
 
+    /**
+     * @brief Verifica se uma chave está contida na tabela
+     * * @param key parametro para chave
+     * @return true : se está contida
+     * @return false : se não está contida
+     */
     bool contains(const K& key) const override {
         return aux_search(key) != -1;
     }
 
+    /**
+     * @brief Retorna o número de elementos ativos na tabela
+     * * @return std::size_t 
+     */
     std::size_t size() const override {
         return m_number_of_elements;
     }
 
+    /**
+     * @brief Método responsável por retornar o Iterador da Tabela
+     * * @return Iterator<K, V>* */
     Iterator<K, V>* getIterator() const override {
         return new HashIterator(m_table);
     }
 
+    /**
+     * @brief Retorna a capacidade atual de slots na tabela
+     * * @return size_t 
+     */
     size_t capacity() const {
         return m_table_size;
     }
 
+    /**
+     * @brief Verifica se a tabela não possui nenhum elemento ativo
+     * * @return true : se estiver vazia
+     * @return false : se possuir elementos
+     */
     bool empty() const {
         return m_number_of_elements == 0;
     }
 
+    /**
+     * @brief Retorna o fator de carga atual da tabela
+     * * @return float 
+     */
     float load_factor() const {
         return static_cast<float>(m_number_of_elements)
              / static_cast<float>(m_table_size);
     }
 
+    /**
+     * @brief Retorna o fator de carga máximo suportado pela tabela
+     * * @return float 
+     */
     float max_load_factor() const {
         return m_max_load_factor;
     }
 
+    /**
+     * @brief Responsável por redimensionar e re-espalhar os elementos da tabela, 
+     * chamada quando o fator de carga chega ao limite.
+     * * @param m : tamanho base para gerar o próximo tamanho primo da tabela
+     */
     void rehash(size_t m) {
         if (m <= m_table_size) return;
 
@@ -219,10 +355,19 @@ public:
         }
     }
 
+    /**
+     * @brief Retorna o numero de comparações feitas ao procurar por uma chave
+     * * @return size_t 
+     */
     size_t getComparison_Counter() const {
         return m_comparison_count;
     }
 
+    /**
+     * @brief Sobrecarga do operador [] para acessar ou inserir valores via chave
+     * * @param k parametro para chave
+     * @return V& referência para o valor associado
+     */
     V& operator[](const K& k) {
         int idx = aux_search(k);
         if (idx != -1) {
@@ -242,6 +387,11 @@ public:
         throw std::runtime_error("operator[]: tabela sem espaço disponível.");
     }
 
+    /**
+     * @brief Sobrecarga do operador [] (constante) para leitura de valores
+     * * @param k parametro para chave
+     * @return const V& referência constante para o valor associado
+     */
     const V& operator[](const K& k) const {
         int idx = aux_search(k);
         if (idx == -1) {

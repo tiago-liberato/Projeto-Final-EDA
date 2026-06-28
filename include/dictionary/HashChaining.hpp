@@ -16,7 +16,7 @@ using namespace std;
  */
 template<typename K>
 
-struct Hasher {
+struct ChainingHasher {
     size_t operator()(const K& key) const {
         const unsigned char* bytes = reinterpret_cast<const unsigned char*>(&key);
         size_t hash = 14695981039346656037ULL;
@@ -35,7 +35,7 @@ struct Hasher {
  * @tparam  
  */
 template<>
-struct Hasher<string> {
+struct ChainingHasher<string> {
     size_t operator()(const string& key) const {
         size_t hash = 14695981039346656037ULL; // FNV offset basis
         for (unsigned char c : key) {
@@ -56,7 +56,7 @@ struct Hasher<string> {
  * @author
  */
 
-template<typename K, typename V, typename H = Hasher<K>>
+template<typename K, typename V, typename H = ChainingHasher<K>>
 class HashChaining : public Dictionary<K, V>{
 
 private:
